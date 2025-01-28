@@ -69,7 +69,7 @@ jobs:
       matrix:
         platform:
           - name: macos_arm64
-     #     - name: macos_x86_64
+     #     - name: macos_x64
           - name: ios
     runs-on: macos-14
     steps:
