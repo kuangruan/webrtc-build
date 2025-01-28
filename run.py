@@ -232,7 +232,7 @@ PATCHES = {
         "ios_fix_optional.patch",
         "fix_moved_function_call.patch",
     ],
-        "macos_x64": [
+    "macos_x86_64": [
         "add_deps.patch",
         "4k.patch",
         "revive_proxy.patch",
@@ -698,7 +698,7 @@ WEBRTC_BUILD_TARGETS_MACOS_COMMON = [
 ]
 WEBRTC_BUILD_TARGETS = {
     "macos_arm64": [*WEBRTC_BUILD_TARGETS_MACOS_COMMON, "sdk:mac_framework_objc"],
-    "macos_x64": [*WEBRTC_BUILD_TARGETS_MACOS_COMMON, "sdk:mac_framework_objc"],
+    "macos_x86_64": [*WEBRTC_BUILD_TARGETS_MACOS_COMMON, "sdk:mac_framework_objc"],
     "ios": [*WEBRTC_BUILD_TARGETS_MACOS_COMMON, "sdk:framework_objc"],
     "android": [
         "sdk/android:libwebrtc",
@@ -710,7 +710,7 @@ WEBRTC_BUILD_TARGETS = {
 
 def get_build_targets(target):
     ts = [":default"]
-    if target not in ("windows_x86_64", "windows_arm64", "ios", "macos_arm64","macos_x64"):
+    if target not in ("windows_x86_64", "windows_arm64", "ios", "macos_arm64","macos_x86_64"):
         ts += ["buildtools/third_party/libc++"]
     ts += WEBRTC_BUILD_TARGETS.get(target, [])
     return ts
@@ -994,10 +994,10 @@ def build_webrtc(
                 f'target_cpu="{"x64" if target == "windows_x86_64" else "arm64"}"',
                 "use_custom_libcxx=false",
             ]
-        elif target in ("macos_arm64",):
+        elif target in ("macos_arm64","macos_x86_64"):
             gn_args += [
                 'target_os="mac"',
-                'target_cpu="arm64"',
+                f'target_cpu="{"x64" if target == "macos_x86_64" else "arm64"}"',
                 f'mac_deployment_target="{deps_info.macos_deployment_target}"',
                 "enable_stripping=true",
                 "enable_dsyms=true",
@@ -1009,21 +1009,6 @@ def build_webrtc(
                 "clang_use_chrome_plugins=false",
                 "use_lld=false",
             ]
-        elif target in ("macos_x64",):
-            gn_args += [
-                'target_os="mac"',
-                'target_cpu="x64"',
-                f'mac_deployment_target="{deps_info.macos_deployment_target}"',
-                "enable_stripping=true",
-                "enable_dsyms=true",
-                "rtc_libvpx_build_vp9=true",
-                "rtc_enable_symbol_export=true",
-                "rtc_enable_objc_symbol_export=false",
-                "use_custom_libcxx=false",
-                "treat_warnings_as_errors=false",
-                "clang_use_chrome_plugins=false",
-                "use_lld=false",
-            ]    
         elif target in (
             "raspberry-pi-os_armv6",
             "raspberry-pi-os_armv7",
@@ -1071,7 +1056,7 @@ def build_webrtc(
     cmd(["ninja", "-C", webrtc_build_dir, *get_build_targets(target)])
     if target in ["windows_x86_64", "windows_arm64"]:
         pass
-    elif target in ("macos_arm64","macos_x64"):
+    elif target in ("macos_arm64","macos_x86_64"):
         ar = "/usr/bin/ar"
     else:
         ar = os.path.join(webrtc_src_dir, "third_party/llvm-build/Release+Asserts/bin/llvm-ar")
@@ -1083,7 +1068,7 @@ def build_webrtc(
         )
 
     # macOS の場合は WebRTC.framework に追加情報を入れる
-    if (target in ("macos_arm64","macos_x64")) and not nobuild_macos_framework:
+    if (target in ("macos_arm64","macos_x86_64")) and not nobuild_macos_framework:
         branch, commit, revision, maint = get_webrtc_version_info(version_info)
         info = {}
         info["branch"] = branch
@@ -1260,7 +1245,7 @@ def package_webrtc(
         os.path.join(webrtc_package_dir, "LICENSE.md"), os.path.join(webrtc_package_dir, "NOTICE")
     )
 
-    if target in ["ios", "macos_arm64","macos_x64"]:
+    if target in ["ios", "macos_arm64","macos_x86_64"]:
         # libwebrtc を　M123 に更新した際に、 Xcode で libvpx がビルドできなくなった
         # LLVM 由来の arm_neon_sve_bridge.h というファイルをパッチで追加してビルド・エラーを解消したので、
         # ライセンスを追加する
@@ -1291,7 +1276,7 @@ def package_webrtc(
         files = [
             (["obj", "webrtc.lib"], ["lib", "webrtc.lib"]),
         ]
-    elif target in ("macos_arm64","macos_x64"):
+    elif target in ("macos_arm64","macos_x86_64"):
         files = [
             (["libwebrtc.a"], ["lib", "libwebrtc.a"]),
             (["WebRTC.xcframework"], ["Frameworks", "WebRTC.xcframework"]),
@@ -1349,7 +1334,7 @@ TARGETS = [
     "windows_x86_64",
     "windows_arm64",
     "macos_arm64",
-    "macos_x64",
+    "macos_x86_64",
     "ubuntu-20.04_x86_64",
     "ubuntu-22.04_x86_64",
     "ubuntu-24.04_x86_64",
@@ -1372,7 +1357,7 @@ def check_target(target):
         return target in ["windows_x86_64", "windows_arm64"]
     elif platform.system() == "Darwin":
         logging.info(f"OS: {platform.system()}")
-        return target in ("macos_arm64", "ios","macos_x64")
+        return target in ("macos_arm64", "ios","macos_x86_64")
     elif platform.system() == "Linux":
         release = read_version_file("/etc/os-release")
         os = release["NAME"]

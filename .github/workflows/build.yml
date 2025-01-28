@@ -69,7 +69,7 @@ jobs:
       matrix:
         platform:
           - name: macos_arm64
-     #     - name: macos_x64
+          - name: macos_x86_64
           - name: ios
     runs-on: macos-14
     steps:
@@ -82,7 +82,7 @@ jobs:
           git config --global user.name  "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
       - name: Build ${{ matrix.platform.name }} for macos
-        if: matrix.platform.name == 'macos_arm64'
+        if: matrix.platform.name == 'macos_arm64' || matrix.platform.name == 'macos_x86_64'
         run: |
           python3 run.py build ${{ matrix.platform.name }}
           python3 run.py package ${{ matrix.platform.name }}
@@ -101,24 +101,24 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - name: raspberry-pi-os_armv6
-            runs-on: ubuntu-20.04
-          - name: raspberry-pi-os_armv7
-            runs-on: ubuntu-20.04
-          - name: raspberry-pi-os_armv8
-            runs-on: ubuntu-20.04
-          - name: ubuntu-20.04_armv8
-            runs-on: ubuntu-20.04
-          - name: ubuntu-22.04_armv8
-            runs-on: ubuntu-22.04
-          - name: ubuntu-24.04_armv8
-            runs-on: ubuntu-24.04
-          - name: ubuntu-20.04_x86_64
-            runs-on: ubuntu-20.04
-          - name: ubuntu-22.04_x86_64
-            runs-on: ubuntu-22.04
-          - name: ubuntu-24.04_x86_64
-            runs-on: ubuntu-24.04
+          # - name: raspberry-pi-os_armv6
+          #   runs-on: ubuntu-20.04
+          # - name: raspberry-pi-os_armv7
+          #   runs-on: ubuntu-20.04
+          # - name: raspberry-pi-os_armv8
+          #   runs-on: ubuntu-20.04
+          # - name: ubuntu-20.04_armv8
+          #   runs-on: ubuntu-20.04
+          # - name: ubuntu-22.04_armv8
+          #   runs-on: ubuntu-22.04
+          # - name: ubuntu-24.04_armv8
+          #   runs-on: ubuntu-24.04
+          # - name: ubuntu-20.04_x86_64
+          #   runs-on: ubuntu-20.04
+          # - name: ubuntu-22.04_x86_64
+          #   runs-on: ubuntu-22.04
+          # - name: ubuntu-24.04_x86_64
+          #   runs-on: ubuntu-24.04
           - name: android
             runs-on: ubuntu-22.04
     runs-on: ${{ matrix.platform.runs-on }}
@@ -195,34 +195,37 @@ jobs:
           platform: macos_arm64
       - uses: ./.github/actions/download
         with:
+          platform: macos_x86_64
+      - uses: ./.github/actions/download
+        with:
           platform: ios
-      - uses: ./.github/actions/download
-        with:
-          platform: raspberry-pi-os_armv6
-      - uses: ./.github/actions/download
-        with:
-          platform: raspberry-pi-os_armv7
-      - uses: ./.github/actions/download
-        with:
-          platform: raspberry-pi-os_armv8
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-20.04_armv8
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-22.04_armv8
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-24.04_armv8
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-20.04_x86_64
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-22.04_x86_64
-      - uses: ./.github/actions/download
-        with:
-          platform: ubuntu-24.04_x86_64
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: raspberry-pi-os_armv6
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: raspberry-pi-os_armv7
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: raspberry-pi-os_armv8
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-20.04_armv8
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-22.04_armv8
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-24.04_armv8
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-20.04_x86_64
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-22.04_x86_64
+      # - uses: ./.github/actions/download
+      #   with:
+      #     platform: ubuntu-24.04_x86_64
       - uses: ./.github/actions/download
         with:
           platform: android
