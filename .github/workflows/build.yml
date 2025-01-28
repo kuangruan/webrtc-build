@@ -69,6 +69,7 @@ jobs:
       matrix:
         platform:
           - name: macos_arm64
+          - name: macos_x86_64
           - name: ios
     runs-on: macos-14
     steps:
@@ -81,7 +82,7 @@ jobs:
           git config --global user.name  "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
       - name: Build ${{ matrix.platform.name }} for macos
-        if: matrix.platform.name == 'macos_arm64'
+    #    if: matrix.platform.name == 'macos_arm64'
         run: |
           python3 run.py build ${{ matrix.platform.name }}
           python3 run.py package ${{ matrix.platform.name }}
@@ -192,6 +193,9 @@ jobs:
       - uses: ./.github/actions/download
         with:
           platform: macos_arm64
+      - uses: ./.github/actions/download
+        with:
+          platform: macos_x86_64
       - uses: ./.github/actions/download
         with:
           platform: ios
