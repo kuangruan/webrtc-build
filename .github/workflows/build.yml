@@ -195,9 +195,6 @@ jobs:
           platform: macos_arm64
       - uses: ./.github/actions/download
         with:
-          platform: macos_x86_64
-      - uses: ./.github/actions/download
-        with:
           platform: ios
       - uses: ./.github/actions/download
         with:
