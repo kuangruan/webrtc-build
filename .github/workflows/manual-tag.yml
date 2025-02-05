@@ -1,4 +1,4 @@
-name: build
+name: manual-tag
 on:
   workflow_dispatch:
     inputs:
