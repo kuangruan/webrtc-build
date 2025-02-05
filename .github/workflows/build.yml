@@ -71,11 +71,11 @@ jobs:
           - name: macos_arm64
           - name: macos_x86_64
           - name: ios
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode 15.4
-        run: sudo xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer
+      - name: Select Xcode 16.2
+        run: sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
       - run: brew install ninja
       - name: Setup Git User
         run: |
